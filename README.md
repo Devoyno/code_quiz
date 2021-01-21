@@ -2,7 +2,7 @@
 
 ![Screenshot](ss.png)
 
-
+Visit site @: https://devoyno.github.io/code_quiz/
 
 ## Simple coding quiz using Javascript
 
