@@ -6,11 +6,14 @@
   var questionTitle = document.getElementById("question-title");
   var result = document.getElementById("result");
   var cardComplete = document.getElementById('card-complete');
+  var hsButton = document.getElementById('high-scores');
+  var topScore = document.getElementById('top-score');
   
   var Q = 0;
   var timer = 75;
   var timerRunning = false;
   var timerInterval;
+  var correct = [];
   
   startBtn.addEventListener("click", function () {
     startCard.setAttribute("class", "hide");
@@ -22,28 +25,34 @@
   saveBtn.addEventListener("click", function () {
     saveScore();
   });
+
+  hsButton.addEventListener("click", function() {
+    loadHighScores()
+    topScore.classList.remove("hide");
+    startCard.setAttribute("class", "hide");
+  })
   
   var questions = [
     {
       question: "Commonly used data types DO NOT include:",
       choices: ["strings", "booleans", "alerts", "numbers"],
-      answers: "alerts",
+      answer: "alerts",
     },
     {
       question:
         "The condition in an if / else statement is enclosed within ____.",
       choices: ["quotes", "curly brackets", "parentheses", "square brackets"],
-      answers: "parentheses",
+      answer: "parentheses",
     },
     {
       question: "Which of these is not used to loop?",
       choices: ["for", "while", "foreach", "sequence"],
-      answers: "sequence",
+      answer: "sequence",
     },
     {
       question: "Which of these is not a way to save a variable",
       choices: ["vet", "var", "let", "const"],
-      answers: "vet",
+      answer: "vet",
     },
     {
       question:
@@ -63,7 +72,7 @@
           timer = 0;
           endGame()
         }
-        displayTimer();
+        displayTimer()
       }, 1000);
     }
   }
@@ -98,11 +107,11 @@
       });
   } 
   // else {
-  //   stopTimer();
-  //   quizCard.setAttribute("class", "hide");
-  //   cardComplete.classList.remove("hide");
-  //   questionTitle.textContent = 'All Done!';
-  //   document.getElementById("final-score").value = timer;
+  //   // stopTimer();
+  //   // quizCard.setAttribute("class", "hide");
+  //   // cardComplete.classList.remove("hide");
+  //   // questionTitle.textContent = 'All Done!';
+  //   // document.getElementById("final-score").value = timer;
   // }
   
   
@@ -111,22 +120,32 @@
     if(timer === 0) {
       endGame();
     }
-    console.log(this.value);
+
     //if statement to check right or wrong
-    if (questions[Q].answer == this.value) {
+    if (questions[Q].answer ===  this.value) {
+      console.log('correct');
       result.textContent = 'Correct!';
+      correct.push(questions[Q])
+      
     } else { 
+      console.log('wrong');
       result.textContent = 'Wrong';
       timer -= 10;
     }
     Q++;
-    if(Q === questions.length) {
-      endGame()
-      //endgame
-      console.log("end game")
-    } else {
-      buildCard();
-    }
+    setTimeout(function() {
+      if(Q === questions.length) {
+        console.log('end game');
+        endGame()
+  
+        //endgame
+  
+      } else {
+        console.log('build-card');
+        buildCard();
+      }
+    }, 2000) 
+    
    
   
   }
@@ -140,35 +159,40 @@
   
   function saveScore() {
     var nameEl = document.getElementById("name");
+    var score = timer * correct.length;
+    console.log(score)
     // var scores = [];
     var scores = JSON.parse(localStorage.getItem('scores')) || [];
     
     var highScoreObj = {
-      name: nameEl.value,
-      score: timer
+     name: nameEl.value,
+     score: timer * correct.length
     }
   
     scores.push(highScoreObj);
-  
+    cardComplete.classList.add("hide")
+    topScore.classList.remove("hide");
     localStorage.setItem('scores', JSON.stringify(scores))
-  
-    loadHighScores(scores);
+    loadHighScores();
   }
 
-function loadHighScores(scores) {
-  console.log(scores);
-  scores.sort(function(a , b){
-    return b.score - a.score;
-  })
+  function loadHighScores() {
+    var scores = JSON.parse(localStorage.getItem('scores')) || [];
+    console.log(scores);
+    scores.sort(function (a, b) {
+      return b.score - a.score;
+    });
 
-  scores.forEach(function(score) {
-    var li = document.createElement("li");
-    var list = document.getElementById("top-score");
+    scores.forEach(function (score) {
+      var li = document.createElement("li");
+      var list = document.getElementById("top-score");
 
-    li.textContent = score.name + " " + score.score;
-    list.appendChild(li);
-  })
-}
+      li.textContent = score.name + " " + score.score;
+      list.appendChild(li);
+    });
+  }
+
+
 
 // if correct: save answer or score and move
 //on
